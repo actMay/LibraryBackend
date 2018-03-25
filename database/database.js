@@ -4,7 +4,8 @@ var db = mysql.createPool({
   host     : 'localhost',
   user     : 'root',
   password : '123456',
-  database : 'library'
+  database : 'library',
+  multipleStatements: true,
 })
 
 var connection = function(callback){

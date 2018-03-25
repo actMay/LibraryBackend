@@ -1,119 +1,50 @@
 var express = require('express');
 var router = express.Router();
 var db = require('./../database/database.js');
+var User = require('./../model/user.js');
+var Book = require('./../model/book.js');
+var System = require('./../model/system.js');
+var BorBook = require('./../model/borBook.js');
+var ReturnBook = require('./../model/returnBook.js');
+var LostBook = require('./../model/lostBook.js');
 
+router.get('/userInfo', User.getData)
+router.get('/userInfo/EditCurrentUserInfo', User.currentEditUser)
+router.get('/userInfo/searchUser', User.searchUser)
+router.post('/userInfo/addUser', User.addUser)
+router.post('/userInfo/EditUser', User.EditUser)
+router.post('/userInfo/delUser', User.delUser)
 
-router.get('/userInfo', function(req, res, next) {
-  db(function(err, connection){
-    connection.query('SELECT * FROM User', function (error, results) {
-      res.send(results)
-      connection.release();
+router.get('/bookInfo', Book.getBookData)
+router.get('/bookInfo/EditCurrentBookInfo', Book.currentEditBook)
+router.get('/bookInfo/searchBook', Book.searchBook)
+router.post('/bookInfo/addBook', Book.addBook)
+router.post('/bookInfo/EditBook', Book.EditBook)
+router.post('/bookInfo/delBook', Book.delBook)
 
-      if (error) throw error;
-    });
-  })
-})
+router.get('/system/getData', System.getData)
+router.post('/system/setTeacher', System.setTeacher);
+router.post('/system/setStu', System.setStu);
 
-router.get('/userInfo/EditCurrentUserInfo', function(req, res, next){
-  var userId = req.query.userId;
-  var sql = 'SELECT * FROM User WHERE userId='+userId;
-  db(function(err, connection){
-    connection.query(sql, function(error, results){
-      res.send(results);
-      connection.release();
-      if(error) throw error;
-    })
-  })
-})
+router.get('/borBook', BorBook.getData)
+router.get('/borBook/EditCurrentBorInfo', BorBook.currentEditBor)
+router.get('/borBook/searchBor', BorBook.searchBor)
+router.post('/borBook/addBor', BorBook.addBor)
+router.post('/borBook/EditBor', BorBook.EditBor)
+router.post('/borBook/delBor', BorBook.delBor)
 
-router.post('/userInfo/addUser', function(req, res, next) {
-  var data = req.body;
-  var userId = data.userId;
-  var userName = data.userName;
-  var userPass= data.userPass;
-  var userType= data.userType;
-  var userSex = data.userSex;
-  var userCollege= data.userCollege;
-  var userDepart= data.userDepart;
-  db(function(err, connection) {
-    if(!Number(userId)) {
-      res.send({'resultCode': '111111'})
-    } else {
-      var sql = "INSERT INTO User(userId, userName, password, isTeacher, sex, college, department) VALUES(" +userId+","+"'"+userName+"'"+","+"'"+userPass+"'"+","+"'"+userType+"'"+","+"'"+userSex+"'"+","+"'"+userCollege+"'"+","+"'"+userDepart +"'" + ")";
-      connection.query(sql, function(error, results) {
-        if(results) {
-          res.send({'resultCode': '000000'})
-        }else {
-          res.send({'resultCode': '111111'})
-        }
-        connection.release();
-        if(error) throw error;
-      })
-    }
-  })
-})
+router.get('/returnBook', ReturnBook.getData)
+router.get('/returnBook/EditCurrentBorInfo', ReturnBook.currentEditBor)
+router.get('/returnBook/searchBor',ReturnBook.EditBor)
+router.post('/returnBook/addBor', ReturnBook.addBor)
+router.post('/returnBook/EditBor', ReturnBook.EditBor)
+router.post('/returnBook/delBor', ReturnBook.delBor)
 
-router.get('/userInfo/searchUser', function(req, res, next) {
-  var data = req.query
-  var userId = data.userId;
-  var userName = data.userName;
-  var sort = data.userSort;
-  db(function(err, connection) {
-    if(!userId) {
-      res.send({'resultCode':'111111'})
-    }else{
-      var userIdSql = userId ? "userId=" + "'" + userId + "'" : '';
-      var userNameSql = userId ? (userName ? " and userName="+ "'" + userName + "' ": '') : (userName ? " userName="+ "'" + userName + "' ": '');
-      var sortSql = sort ? "and isTeacher="+ "'" + sort + "'": '';
-      if(sortSql) {
-        sortSql = "and isTeacher="+ "'" + sort + "'"
-      }else if(userIdSql) {
-        sortSql = "isTeacher="+"'" + sort + "'"
-      }
-      var sql = "SELECT *  FROM User WHERE " + userIdSql + userNameSql + sortSql;
-      connection.query(sql, function(error, results) {
-        res.send(results);
-        connection.release();
-        if(error) throw error;
-      })
-    }
-  })
-})
-
-router.post('/userInfo/EditUser', function(req, res, next) {
-  var data = req.body;
-  var oldId = data.oldId;
-  var userId = data.userId;
-  var userName = data.userName;
-  var userPass= data.userPass;
-  var userType= data.userType;
-  var userSex = data.userSex;
-  var userCollege= data.userCollege;
-  var userDepart= data.userDepart;
-  console.log(data)
-  db(function(err, connection) {
-    var sql = "UPDATE User SET userId="+ userId+","+"userName='"+userName+"'"+","+"password='"+userPass+"'"+","+"isTeacher='"+userType+"'"+","+"sex='"+userSex+"'"+","+"college='"+userCollege+"'"+","+"department='"+userDepart+"'"+ " WHERE userId="+oldId;
-    connection.query(sql, function(error, results) {
-      
-      res.send({'resultCode': '000000'})
-
-      connection.release();
-      if(error) throw error;
-
-    })
-  })
-})
-
-router.post('/userInfo/delUser', function(req, res, nex) {
-  var userId = req.body.userId;
-  db(function(err, connection) {
-    var sql = "DELETE FROM User WHERE userId=" + userId;
-    connection.query(sql, function(error, results) {
-      res.send({'resultCode': '000000'})
-      connection.release();
-      if(error) throw error;
-    })
-  })
-})
+router.get('/lostBook', LostBook.getData)
+router.get('/lostBook/EditCurrentLostBook', LostBook.currentEditUser)
+router.get('/lostBook/searchLostBook', LostBook.searchUser)
+router.post('/lostBook/addLostBook', LostBook.addUser)
+router.post('/lostBook/EditLostBook', LostBook.EditUser)
+router.post('/lostBook/delLostBook', LostBook.delUser)
 
 module.exports = router;
