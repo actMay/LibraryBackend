@@ -1,4 +1,5 @@
 var db = require('./../database/database.js');
+var moment = require('moment');
 
 module.exports = {
   "getData": function(req, res, next) {
@@ -31,7 +32,7 @@ module.exports = {
     var userType= data.userType;
     var userSex = data.userSex;
     db(function(err, connection) {
-      if(!Number(userId)) {
+      if(!Number(userId)) { 
         res.send({'resultCode': '111111'})
       } else {
         var sql = "INSERT INTO LostBook(lostId, bookName, bookId, lostTime, lostReason) VALUES(" +userId+","+"'"+userName+"'"+","+"'"+userPass+"'"+","+"'"+userType+"'"+","+"'"+userSex + "'" + ")";
@@ -53,15 +54,15 @@ module.exports = {
     var userId = data.lostId;
     var userName = data.bookId;
     var sort = data.bookName;
-    db(function(err, connection) { 
+    db(function(err, connection) {
 
       var userIdSql = userId ? "lostId=" + "'" + userId + "'" : '';
       var userNameSql = userId ? (userName ? " and bookId="+ "'" + userName + "' ": '') : (userName ? " bookId="+ "'" + userName + "' ": '');
       var sortSql;
       if(userIdSql||userNameSql) {
-        sortSql = "and bookName="+ "'" + sort + "'"
+        sortSql = "and bookName like"+ "'%" + sort + "%'"
       }else{
-        sortSql = "bookName="+"'" + sort + "'"
+        sortSql = "bookName like"+"'%" + sort + "%'"
       }
       sortSql = sort ? sortSql : ''
       var sql = "SELECT *  FROM LostBook WHERE " + userIdSql + userNameSql + sortSql;

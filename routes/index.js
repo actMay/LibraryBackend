@@ -7,12 +7,14 @@ var System = require('./../model/system.js');
 var BorBook = require('./../model/borBook.js');
 var ReturnBook = require('./../model/returnBook.js');
 var LostBook = require('./../model/lostBook.js');
+var multer  = require('multer');
+var upload = multer({ dest: 'public/upload/' });
 
 router.get('/userInfo', User.getData)
 router.get('/userInfo/EditCurrentUserInfo', User.currentEditUser)
 router.get('/userInfo/searchUser', User.searchUser)
 router.post('/userInfo/addUser', User.addUser)
-router.post('/userInfo/EditUser', User.EditUser)
+router.post('/userInfo/EditUser', upload.single('img'), User.EditUser)
 router.post('/userInfo/delUser', User.delUser)
 
 router.get('/bookInfo', Book.getBookData)

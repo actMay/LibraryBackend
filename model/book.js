@@ -61,7 +61,7 @@ module.exports = {
     console.log(data)
     db(function(err, connection) {
       var bookIdSql = bookId ? "bookId=" + "'" + bookId + "'" : '';
-      var bookNameSql = bookId ? (bookName ? " and bookName="+ "'" + bookName + "' ": '') : (bookName ? " bookName="+ "'" + bookName + "' ": '');
+      var bookNameSql = bookId ? (bookName ? " and bookName like"+ "'%" + bookName + "%' ": '') : (bookName ? " bookName like"+ "'%" + bookName + "%' ": '');
       var sortSql;
       var authorSql;
       if(bookIdSql||bookNameSql) {

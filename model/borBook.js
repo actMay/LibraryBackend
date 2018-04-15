@@ -1,4 +1,5 @@
 var db = require('./../database/database.js');
+var moment =require('moment');
 
 module.exports = {
   "getData": function(req, res, next) {
@@ -36,7 +37,7 @@ module.exports = {
         res.send({'resultCode': '111111'})
       } else {
         var sql = "INSERT INTO BorBook(borId, bookId, time, personId, detail) VALUES(" +userId+","+"'"+userName+"'"+","+"'"+userPass+"'"+","+"'"+userType+"'"+","+"'"+userSex+"'"+ ")";
-        console.log(sql) 
+        console.log(sql)
         connection.query(sql, function(error, results) {
           if(results) {
             res.send({'resultCode': '000000'})
@@ -60,15 +61,27 @@ module.exports = {
       var userNameSql = userId ? (userName ? " and personId="+ "'" + userName + "' ": '') : (userName ? " personId="+ "'" + userName + "' ": '');
       var sortSql;
       if(userIdSql||userNameSql) {
-        sortSql = "and time="+ "'" + sort + "'"
+        sortSql = "and date_format('time','%Y-%m-%d')="+"'"+sort+"'"
       }else{
-        sortSql = "time="+"'" + sort + "'"
+        sortSql = "date_format('time','%Y-%m-%d')="+"'"+sort+"'"
       }
       sortSql = sort ? sortSql : ''
-      var sql = "SELECT *  FROM BorBook WHERE " + userIdSql + userNameSql + sortSql;
+      // var timeSql = date_format('time','%Y-%m-%d')=sort;
+      var sql = "SELECT *  FROM BorBook WHERE " + userIdSql + userNameSql ;
+      if(!(userIdSql||userNameSql)){
+        sql="SELECT *  FROM BorBook"
+      }
       console.log(sql)
       connection.query(sql, function(error, results) {
-        res.send(results);
+        if(sort) {
+          var filRes = results.filter(function(value, index){
+            console.log(moment(value.time).format('YYYY-MM-DD HH:mm:ss').toString().slice(0,10))
+            if(moment(value.time).format('YYYY-MM-DD HH:mm:ss').toString().slice(0,10)==sort){
+              return value
+            }
+          })
+        }
+        res.send(filRes);
         connection.release();
         if(error) throw error;
       })

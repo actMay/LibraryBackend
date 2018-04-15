@@ -56,16 +56,20 @@ module.exports = {
     db(function(err, connection) {
 
       var userIdSql = userId ? "userId=" + "'" + userId + "'" : '';
-      var userNameSql = userId ? (userName ? " and userName="+ "'" + userName + "' ": '') : (userName ? " userName="+ "'" + userName + "' ": '');
+      var userNameSql = userId ? (userName ? " and userName like"+ "'%" + userName + "%' ": '') : (userName ? " userName like"+ "'%" + userName + "%' ": '');
       var sortSql;
       if(userIdSql||userNameSql) {
         sortSql = "and isTeacher="+ "'" + sort + "'"
       }else{
         sortSql = "isTeacher="+"'" + sort + "'"
       }
-      sortSql = sort ? sortSql : ''
-      var sql = "SELECT *  FROM User WHERE " + userIdSql + userNameSql + sortSql;
-      console.log(sql)
+      sortSql = sort ? sortSql : '';
+      if(!(userIdSql||userNameSql||sortSql)) {
+        var sql = "SELECT *  FROM User";
+      }else{
+
+        var sql = "SELECT *  FROM User WHERE " + userIdSql + userNameSql + sortSql;
+      }
       connection.query(sql, function(error, results) {
         res.send(results);
         connection.release();
@@ -84,12 +88,15 @@ module.exports = {
     var userSex = data.userSex;
     var userCollege= data.userCollege;
     var userDepart= data.userDepart;
-    console.log(data)
+    // var img = data.img;
+    console.log(req.file, req.body)
     db(function(err, connection) {
-      var sql = "UPDATE User SET userId="+ userId+","+"userName='"+userName+"'"+","+"password='"+userPass+"'"+","+"isTeacher='"+userType+"'"+","+"sex='"+userSex+"'"+","+"college='"+userCollege+"'"+","+"department='"+userDepart+"'"+ " WHERE userId="+oldId;
+      var sql = "UPDATE User SET userId="+ userId+","+"userName='"+userName+"'"+","+"password='"+userPass+"'"+","
+      +"isTeacher='"+userType+"'"+","+"sex='"+userSex+"'"+","+"college='"+userCollege+"'"+","+"pic='"+req.file.filename+"',"
+      +"department='"+userDepart+"'"+ " WHERE userId="+oldId;
       connection.query(sql, function(error, results) {
 
-        res.send({'resultCode': '000000'})
+        res.send({'resultCode': '000000', 'filename': req.file.filename})
 
         connection.release();
         if(error) throw error;
